@@ -10,6 +10,7 @@ import site.stellarburgers.api.models.user.authentication.LoginSuccessPojo;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static site.stellarburgers.api.BaseApiRequests.ST_BURGERS_LOGIN;
 
 public class LoginTest extends BaseTestMethods{
 
@@ -24,7 +25,7 @@ public class LoginTest extends BaseTestMethods{
         logIn(authCredentials);
 
         // Проверка кода ответа на успешную авторизацию
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         // Десериализуем тело ответа для проверки
         LoginSuccessPojo responseBody = response.as(LoginSuccessPojo.class);
@@ -78,13 +79,13 @@ public class LoginTest extends BaseTestMethods{
         logIn(authCredentials);
 
         // Проверка кода ответа на неуспешную авторизацию
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "email or password are incorrect");
+        api.verifyResponseBodyParameter(response, "message", "email or password are incorrect");
     }
 
     @Test
@@ -101,13 +102,13 @@ public class LoginTest extends BaseTestMethods{
         logIn(authCredentials);
 
         // Проверка кода ответа на неуспешную авторизацию
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "email or password are incorrect");
+        api.verifyResponseBodyParameter(response, "message", "email or password are incorrect");
     }
 
     @Test
@@ -125,18 +126,18 @@ public class LoginTest extends BaseTestMethods{
         logIn(authCredentials);
 
         // Проверка кода ответа на неуспешную авторизацию
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "email or password are incorrect");
+        api.verifyResponseBodyParameter(response, "message", "email or password are incorrect");
     }
 
     @Step("Попытка авторизации в аккаунт")
     private void logIn(LoginPojo authCredentials){
         //Отправляем запрос на авторизацию
-        response = sendPostRequest(ST_BURGERS_LOGIN, authCredentials);
+        response = api.sendPostRequest(ST_BURGERS_LOGIN, authCredentials);
     }
 }

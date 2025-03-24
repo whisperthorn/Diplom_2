@@ -4,13 +4,16 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.After;
 import org.junit.Test;
 import site.stellarburgers.api.models.user.change.info.ChangeUserInfoPojo;
 import site.stellarburgers.api.models.user.change.info.ChangeUserInfoSuccessPojo;
 
 import static org.apache.http.HttpStatus.*;
+import static site.stellarburgers.api.BaseApiRequests.ST_BURGERS_USER;
 
 public class ChangeUserInfoTest extends BaseTestMethods{
+    private String bearerTokenTest = "";
 
     @Test
     @DisplayName("Изменение данных в поле email с авторизацией.")
@@ -26,7 +29,7 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         changeUserInfo(changeCredentials, bearerToken);
 
         // Проверка кода ответа на успешное изменение данных
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         // Десериализуем тело ответа для проверки
         ChangeUserInfoSuccessPojo responseBody = response.as(ChangeUserInfoSuccessPojo.class);
@@ -63,7 +66,7 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         changeUserInfo(changeCredentials, bearerToken);
 
         // Проверка кода ответа на успешное изменение данных
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         // Десериализуем тело ответа для проверки
         ChangeUserInfoSuccessPojo responseBody = response.as(ChangeUserInfoSuccessPojo.class);
@@ -97,7 +100,7 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         createAccount(newEmail, password, firstName);
 
         //Сохраняем токен второго аккаунта для последующего удаления
-        String bearerTokenTest = response.jsonPath().getString("accessToken");
+        bearerTokenTest = response.jsonPath().getString("accessToken");
 
         //Сериализуем данные для отправки в запросе используя email второго аккаунта
         ChangeUserInfoPojo changeCredentials = new ChangeUserInfoPojo(newEmail, firstName);
@@ -106,16 +109,13 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         changeUserInfo(changeCredentials, bearerToken);
 
         // Проверка кода ответа на неуспешное изменение данных
-        verifyStatusCode(response,SC_FORBIDDEN);
+        api.verifyStatusCode(response,SC_FORBIDDEN);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "User with such email already exists");
-
-        //Удаляем второй аккаунт
-        deleteAccount(bearerTokenTest);
+        api.verifyResponseBodyParameter(response, "message", "User with such email already exists");
     }
 
     @Test
@@ -132,13 +132,13 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         changeUserInfo(changeCredentials);
 
         // Проверка кода ответа на неуспешное изменение данных
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "You should be authorised");
+        api.verifyResponseBodyParameter(response, "message", "You should be authorised");
     }
 
     @Test
@@ -155,22 +155,31 @@ public class ChangeUserInfoTest extends BaseTestMethods{
         changeUserInfo(changeCredentials);
 
         // Проверка кода ответа на неуспешное изменение данных
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "You should be authorised");
+        api.verifyResponseBodyParameter(response, "message", "You should be authorised");
     }
 
     @Step("Попытка обновить данные пользователя используя токен авторизации")
     private void changeUserInfo(ChangeUserInfoPojo changeCredentials, String bearerToken){
-        response = sendPatchRequestWithAuth(ST_BURGERS_USER, changeCredentials, bearerToken);
+        response = api.sendPatchRequestWithAuth(ST_BURGERS_USER, changeCredentials, bearerToken);
     }
 
     @Step("Попытка обновить данные пользователя без токена авторизации")
     private void changeUserInfo(ChangeUserInfoPojo changeCredentials){
-        response = sendPatchRequest(ST_BURGERS_USER, changeCredentials);
+        response = api.sendPatchRequest(ST_BURGERS_USER, changeCredentials);
+    }
+
+    @After
+    public void tearDown(){
+        //Запускаем tearDown() BaseTestMethods
+        super.tearDown();
+
+        //Удаляем второй тестовый аккаунт
+        deleteAccount(bearerTokenTest);
     }
 }

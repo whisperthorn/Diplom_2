@@ -2,6 +2,7 @@ package site.stellarburgers.api;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.RestAssured;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,12 +10,19 @@ import site.stellarburgers.api.models.create.account.CreateAccountPojo;
 import site.stellarburgers.api.models.create.account.CreateAccountSuccessPojo;
 
 import static org.apache.http.HttpStatus.*;
+import static site.stellarburgers.api.BaseApiRequests.*;
 
 public class CreateAccountTest extends BaseTestMethods {
 
     @Override
     @Before
     public void setUp(){
+        api = new BaseApiRequests();
+
+        //Задаем базовый url
+        RestAssured.baseURI = ST_BURGERS_BASE_URL;
+
+        //Генерируем персональные данные
         generateCredentials();
         bearerToken = "";
     }
@@ -27,10 +35,10 @@ public class CreateAccountTest extends BaseTestMethods {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST-запрос для регистрации пользователя
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         // Проверка кода ответа на успешную регистрацию
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         // Десериализуем тело ответа для проверки
         CreateAccountSuccessPojo responseBody = response.as(CreateAccountSuccessPojo.class);
@@ -77,22 +85,22 @@ public class CreateAccountTest extends BaseTestMethods {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST-запрос для регистрации пользователя
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         //Сохраняем токен для удаления аккаунта
         bearerToken = response.jsonPath().getString("accessToken");
 
         // Отправляем второй POST-запрос используя идентичные данные
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         // Проверка кода ответа на неудачную регистрацию
-        verifyStatusCode(response,SC_FORBIDDEN);
+        api.verifyStatusCode(response,SC_FORBIDDEN);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "User already exists");
+        api.verifyResponseBodyParameter(response, "message", "User already exists");
     }
 
     @Test
@@ -106,16 +114,16 @@ public class CreateAccountTest extends BaseTestMethods {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST-запрос для регистрации пользователя
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         // Проверка кода ответа на неудачную регистрацию
-        verifyStatusCode(response,SC_FORBIDDEN);
+        api.verifyStatusCode(response,SC_FORBIDDEN);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message",
+        api.verifyResponseBodyParameter(response, "message",
                 "Email, password and name are required fields");
     }
 
@@ -130,16 +138,16 @@ public class CreateAccountTest extends BaseTestMethods {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST-запрос для регистрации пользователя
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         // Проверка кода ответа на неудачную регистрацию
-        verifyStatusCode(response,SC_FORBIDDEN);
+        api.verifyStatusCode(response,SC_FORBIDDEN);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message",
+        api.verifyResponseBodyParameter(response, "message",
                 "Email, password and name are required fields");
     }
 
@@ -154,16 +162,16 @@ public class CreateAccountTest extends BaseTestMethods {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST-запрос для регистрации пользователя
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
 
         // Проверка кода ответа на неудачную регистрацию
-        verifyStatusCode(response,SC_FORBIDDEN);
+        api.verifyStatusCode(response,SC_FORBIDDEN);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message",
+        api.verifyResponseBodyParameter(response, "message",
                 "Email, password and name are required fields");
 
     }

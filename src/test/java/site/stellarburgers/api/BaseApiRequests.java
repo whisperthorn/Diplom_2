@@ -1,9 +1,8 @@
 package site.stellarburgers.api;
 
 import io.qameta.allure.Step;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.Before;
+
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -16,11 +15,6 @@ public class BaseApiRequests {
     protected static final String ST_BURGERS_USER = "/api/auth/user";
     protected static final String ST_BURGERS_ORDERS = "/api/orders";
     protected static final String ST_BURGERS_INGREDIENTS_LIST = "/api/ingredients";
-
-    @Before
-    public void setBaseUrl() {
-        RestAssured.baseURI = ST_BURGERS_BASE_URL;
-    }
 
     @Step("Отправляем GET-запрос на {endpoint}")
     public Response sendGetRequest(String endpoint) {

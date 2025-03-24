@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static site.stellarburgers.api.BaseApiRequests.ST_BURGERS_ORDERS;
 
 public class GetUserOrderTest extends BaseTestMethods{
 
@@ -29,7 +30,7 @@ public class GetUserOrderTest extends BaseTestMethods{
         getOrders(bearerToken);
 
         // Проверка кода ответа на успешное получение заказов
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         //Десериализуем ответ
         OrderResponsePojo orderList = response.as(OrderResponsePojo.class);
@@ -74,13 +75,13 @@ public class GetUserOrderTest extends BaseTestMethods{
         getOrders();
 
         // Проверка кода ответа на неуспешную авторизацию
-        verifyStatusCode(response,SC_UNAUTHORIZED);
+        api.verifyStatusCode(response,SC_UNAUTHORIZED);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "You should be authorised");
+        api.verifyResponseBodyParameter(response, "message", "You should be authorised");
 
 
     }
@@ -98,12 +99,12 @@ public class GetUserOrderTest extends BaseTestMethods{
 
     @Step("Получаем список заказов используя токен авторизации")
     private void getOrders(String bearerToken){
-        response = sendGetRequestWithAuth(ST_BURGERS_ORDERS, bearerToken);
+        response = api.sendGetRequestWithAuth(ST_BURGERS_ORDERS, bearerToken);
     }
 
     @Step("Получаем список заказов без использования токена авторизации")
     private void getOrders(){
-        response = sendGetRequest(ST_BURGERS_ORDERS);
+        response = api.sendGetRequest(ST_BURGERS_ORDERS);
     }
 
 }

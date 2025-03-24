@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.http.HttpStatus.*;
+import static site.stellarburgers.api.BaseApiRequests.ST_BURGERS_ORDERS;
 
 public class MakeOrderTest extends BaseTestMethods{
     List<String> burger = new ArrayList<>();
@@ -26,7 +27,7 @@ public class MakeOrderTest extends BaseTestMethods{
         makeOrder(burgerOrder, bearerToken);
 
         // Проверка кода ответа на успешное создание заказа
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
 
         //Десериализуем тело ответа для проверки
         MakeOrderSuccessPojo responseBody = response.as(MakeOrderSuccessPojo.class);
@@ -63,7 +64,7 @@ public class MakeOrderTest extends BaseTestMethods{
         makeOrder(burgerOrder);
 
         // Проверка кода ответа на создание заказа без токена авторизации
-        verifyStatusCode(response,SC_OK);
+        api.verifyStatusCode(response,SC_OK);
     }
 
     @Test
@@ -77,13 +78,13 @@ public class MakeOrderTest extends BaseTestMethods{
         makeOrder(burgerOrder, bearerToken);
 
         // Проверка кода ответа на неуспешное создание заказа
-        verifyStatusCode(response,SC_BAD_REQUEST);
+        api.verifyStatusCode(response,SC_BAD_REQUEST);
 
         // Проверяем наличие и значение параметра success
-        verifyResponseBodyParameter(response, "success", false);
+        api.verifyResponseBodyParameter(response, "success", false);
 
         // Проверяем наличие и значение параметра message
-        verifyResponseBodyParameter(response, "message", "Ingredient ids must be provided");
+        api.verifyResponseBodyParameter(response, "message", "Ingredient ids must be provided");
     }
 
     @Test
@@ -100,11 +101,11 @@ public class MakeOrderTest extends BaseTestMethods{
         makeOrder(burgerOrder, bearerToken);
 
         // Проверка кода ответа на неуспешное создание заказа
-        verifyStatusCode(response,SC_INTERNAL_SERVER_ERROR);
+        api.verifyStatusCode(response,SC_INTERNAL_SERVER_ERROR);
     }
 
     @Step("Попытка создать новый заказ без токена авторизации")
     private void makeOrder(MakeOrderPojo burgerOrder){
-        response = sendPostRequest(ST_BURGERS_ORDERS, burgerOrder);
+        response = api.sendPostRequest(ST_BURGERS_ORDERS, burgerOrder);
     }
 }

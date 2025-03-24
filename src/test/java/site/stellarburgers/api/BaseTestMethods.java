@@ -2,6 +2,7 @@ package site.stellarburgers.api;
 
 import com.github.javafaker.Faker;
 import io.qameta.allure.Step;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
@@ -12,17 +13,25 @@ import site.stellarburgers.api.models.make.order.MakeOrderPojo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseTestMethods extends BaseApiRequests {
+import static site.stellarburgers.api.BaseApiRequests.*;
+
+public class BaseTestMethods {
     protected String email;
     protected String password;
     protected String firstName;
     protected CreateAccountPojo credentials;
     protected Response response;
     protected String bearerToken;
+    protected BaseApiRequests api;
 
 
     @Before
     public void setUp(){
+        api = new BaseApiRequests();
+
+        //Задаем базовый url
+        RestAssured.baseURI = ST_BURGERS_BASE_URL;
+
         //Генерируем персональные данные
         generateCredentials();
 
@@ -53,13 +62,13 @@ public class BaseTestMethods extends BaseApiRequests {
         credentials = new CreateAccountPojo(email, password, firstName);
 
         // Отправляем POST запрос на регистрацию
-        response = sendPostRequest(ST_BURGERS_REGISTER, credentials);
+        response = api.sendPostRequest(ST_BURGERS_REGISTER, credentials);
     }
 
     @Step("Удаляем тестовый аккаунт")
     public void deleteAccount(String bearerToken){
         // Отправляем запрос на удаление аккаунта
-        sendDeleteRequest(ST_BURGERS_USER, bearerToken);
+        api.sendDeleteRequest(ST_BURGERS_USER, bearerToken);
     }
 
     @Step("Подготавливаем список ингредиентов для заказа")
@@ -70,7 +79,7 @@ public class BaseTestMethods extends BaseApiRequests {
         List<String> sauce = new ArrayList<>();
 
         // Отправляем запрос на получение списка ингредиентов
-        response = sendGetRequest(ST_BURGERS_INGREDIENTS_LIST);
+        response = api.sendGetRequest(ST_BURGERS_INGREDIENTS_LIST);
 
         // Десериализуем ингредиенты
         IngredientListPojo ingredientList = response.as(IngredientListPojo.class);
@@ -102,6 +111,6 @@ public class BaseTestMethods extends BaseApiRequests {
 
     @Step("Попытка создать новый заказ используя токен авторизации")
     public void makeOrder(MakeOrderPojo burgerOrder, String bearerToken){
-        response = sendPostRequestWithAuth(ST_BURGERS_ORDERS, burgerOrder, bearerToken);
+        response = api.sendPostRequestWithAuth(ST_BURGERS_ORDERS, burgerOrder, bearerToken);
     }
 }
